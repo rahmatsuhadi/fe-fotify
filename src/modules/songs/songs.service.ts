@@ -10,13 +10,13 @@ export const searchSongs = async (keyword: string) => {
       duration: v.duration.seconds,
       durationText: v.duration.timestamp,
       author: v.author.name,
-      thumbnail: v.thumbnail,
+      thumbnail: v.thumbnail || "",
       views: v.views,
     })),
     artists: result.channels.slice(0, 5).map((c) => ({
       name: c.name,
       url: c.url,
-      thumbnail: c.thumbnail,
+      thumbnail: c.thumbnail || "",
       // @ts-ignore
       subscribers: c.subCountLabel || null,
     })),
@@ -40,7 +40,7 @@ export const getSongDetail = async (videoId: string) => {
       duration: video.duration.seconds,
       durationText: video.duration.timestamp,
       author: video.author.name,
-      thumbnail: video.thumbnail,
+      thumbnail: video.thumbnail || "",
       url: video.url,
       views: video.views,
     };
@@ -57,7 +57,7 @@ export const getTrendingSongs = async () => {
     title: v.title,
     duration: v.duration.seconds,
     author: v.author.name,
-    thumbnail: v.thumbnail,
+    thumbnail: v.thumbnail || "",
   }));
 };
 
@@ -89,7 +89,7 @@ export const getPlaylistSongs = async (keyword: string) => {
         duration: v.duration?.seconds || 0,
         durationText: v.duration?.timestamp || "",
         author: v.author.name,
-        thumbnail: v.thumbnail,
+        thumbnail: v.thumbnail || "",
       })),
     };
   } catch (err) {
