@@ -107,3 +107,20 @@ export const getSongSuggestions = async (keyword: string) => {
     return [];
   }
 };
+
+export const getArtistSongs = async (artistName: string) => {
+  try {
+    const result = await yts(`${artistName} songs`);
+    return result.videos.slice(0, 30).map((v) => ({
+      id: v.videoId,
+      title: v.title,
+      duration: v.duration.seconds,
+      durationText: v.duration.timestamp,
+      author: v.author.name,
+      thumbnail: v.thumbnail || "",
+      views: v.views,
+    }));
+  } catch (err) {
+    return [];
+  }
+};

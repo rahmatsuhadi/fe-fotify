@@ -66,4 +66,15 @@ describe("Songs Module - Search", () => {
     expect(data.suggestions.length).toBeGreaterThan(0);
     expect(typeof data.suggestions[0]).toBe("string");
   }, 10000);
+
+  it("Should return songs by artist for a valid artist name", async () => {
+    const response = await app.handle(new Request("http://localhost/api/songs/artist?name=adele"));
+    expect(response.status).toBe(200);
+    const data = await response.json() as any;
+    expect(data).toHaveProperty("songs");
+    expect(Array.isArray(data.songs)).toBe(true);
+    expect(data.songs.length).toBeGreaterThan(0);
+    expect(data.songs[0]).toHaveProperty("id");
+    expect(data.songs[0]).toHaveProperty("title");
+  }, 15000);
 });

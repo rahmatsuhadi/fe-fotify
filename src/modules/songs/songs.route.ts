@@ -1,5 +1,5 @@
 import { Elysia, t, status as error } from "elysia";
-import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs, getSongSuggestions } from "./songs.service";
+import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs, getSongSuggestions, getArtistSongs } from "./songs.service";
 
 const SongSchema = t.Object({
   id: t.String(),
@@ -121,6 +121,34 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
     detail: {
       summary: "Get trending songs",
       description: "Fetch popular/trending music from YouTube",
+    },
+  }
+)
+.get(
+  "/artist",
+  async ({ query, set }) => {
+    try {
+      if (!query.name) {
+        return error(400, { error: "Query parameter 'name' is required" });
+      }
+      const songs = await getArtistSongs(query.name);
+      return { songs };
+    } catch (err) {
+      return error(500, { error: "Internal server error fetching artist songs" });
+    }
+  },
+  {
+    query: t.Object({
+      name: t.String(),
+    }),
+    response: {
+      200: t.Object({ songs: t.Array(SongSchema) }),
+      400: ErrorSchema,
+      500: ErrorSchema,
+    },
+    detail: {
+      summary: "Get songs by artist",
+      description: "Search for an artist by name and fetch their songs",
     },
   }
 )
