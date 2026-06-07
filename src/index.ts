@@ -6,7 +6,7 @@ import { lyricsRoute } from "./modules/lyrics/lyrics.route";
 
 const PORT = process.env.PORT || 3000
 
-export const app = new Elysia()
+const app = new Elysia()
   .use(cors())
   .use(
     openapi({
@@ -31,4 +31,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-
+export default app
