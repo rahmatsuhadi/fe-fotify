@@ -8,8 +8,9 @@
     "start": "NODE_ENV=production bun run src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest",
     "@elysia/openapi": "latest",
+    "@elysiajs/cors": "^1.4.2",
+    "elysia": "latest",
     "yt-search": "latest"
   },
   "devDependencies": {

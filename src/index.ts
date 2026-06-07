@@ -1,9 +1,11 @@
 import { Elysia } from "elysia";
 import { openapi } from "@elysia/openapi";
+import { cors } from "@elysiajs/cors";
 import { songsRoute } from "./modules/songs/songs.route";
 import { lyricsRoute } from "./modules/lyrics/lyrics.route";
 
 export const app = new Elysia()
+  .use(cors())
   .use(
     openapi({
       documentation: {
