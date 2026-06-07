@@ -17,8 +17,46 @@ export const searchSongs = async (keyword: string) => {
       name: c.name,
       url: c.url,
       thumbnail: c.thumbnail,
-      // @ts-ignore (yt-search types might not strictly define subCountLabel, but it exists)
+      // @ts-ignore
       subscribers: c.subCountLabel || null,
     })),
   };
+};
+
+export const getSongDetail = async (videoId: string) => {
+  try {
+    // Add timeout to prevent hanging on invalid IDs
+    const video = await Promise.race([
+      yts({ videoId }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 8000))
+    ]) as any;
+    
+    if (!video) return null;
+    
+    return {
+      id: video.videoId,
+      title: video.title,
+      description: video.description,
+      duration: video.duration.seconds,
+      durationText: video.duration.timestamp,
+      author: video.author.name,
+      thumbnail: video.thumbnail,
+      url: video.url,
+      views: video.views,
+    };
+  } catch (err) {
+    return null; // Return null on error/timeout so route sends 404
+  }
+};
+
+export const getTrendingSongs = async () => {
+  // Use natural search instead of listId because listId tends to hang in yt-search
+  const result = await yts("top hits music official");
+  return result.videos.slice(0, 20).map((v) => ({
+    id: v.videoId,
+    title: v.title,
+    duration: v.duration.seconds,
+    author: v.author.name,
+    thumbnail: v.thumbnail,
+  }));
 };
