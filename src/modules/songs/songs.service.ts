@@ -1,4 +1,5 @@
 import yts from "yt-search";
+import YouTube from "youtube-sr";
 
 export const searchSongs = async (keyword: string) => {
   const result = await yts(keyword);
@@ -70,6 +71,7 @@ export const getPlaylistSongs = async (keyword: string) => {
       return null;
     }
 
+
     const topPlaylist = playlists[0];
 
     const listDetail = await Promise.race([
@@ -94,5 +96,14 @@ export const getPlaylistSongs = async (keyword: string) => {
     };
   } catch (err) {
     return null;
+  }
+};
+
+export const getSongSuggestions = async (keyword: string) => {
+  try {
+    const suggestions = await YouTube.getSuggestions(keyword);
+    return suggestions;
+  } catch (err) {
+    return [];
   }
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { app } from "../../index";
+import app from "../../index";
 
 describe("Songs Module - Search", () => {
   it("Should return 400 if search query 'q' is missing", async () => {
@@ -56,4 +56,14 @@ describe("Songs Module - Search", () => {
     expect(Array.isArray(data.songs)).toBe(true);
     expect(data.songs.length).toBeGreaterThan(0);
   }, 15000);
+
+  it("Should return suggestions for a valid keyword", async () => {
+    const response = await app.handle(new Request("http://localhost/api/songs/suggestions?q=alan+walker"));
+    expect(response.status).toBe(200);
+    const data = await response.json() as any;
+    expect(data).toHaveProperty("suggestions");
+    expect(Array.isArray(data.suggestions)).toBe(true);
+    expect(data.suggestions.length).toBeGreaterThan(0);
+    expect(typeof data.suggestions[0]).toBe("string");
+  }, 10000);
 });

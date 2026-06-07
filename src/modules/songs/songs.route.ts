@@ -1,5 +1,5 @@
 import { Elysia, t, status as error } from "elysia";
-import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs } from "./songs.service";
+import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs, getSongSuggestions } from "./songs.service";
 
 const SongSchema = t.Object({
   id: t.String(),
@@ -71,6 +71,35 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
     detail: {
       summary: "Search for songs and artists",
       description: "Search YouTube for songs and channels using a keyword",
+    },
+  }
+)
+.get(
+  "/suggestions",
+  async ({ query, set }) => {
+    try {
+      if (!query.q) {
+        return error(400, { error: "Query parameter 'q' is required" });
+      }
+      
+      const suggestions = await getSongSuggestions(query.q);
+      return { suggestions };
+    } catch (err) {
+      return error(500, { error: "Internal server error fetching suggestions" });
+    }
+  },
+  {
+    query: t.Object({
+      q: t.String(),
+    }),
+    response: {
+      200: t.Object({ suggestions: t.Array(t.String()) }),
+      400: ErrorSchema,
+      500: ErrorSchema,
+    },
+    detail: {
+      summary: "Get search suggestions",
+      description: "Get autocomplete search suggestions based on keyword",
     },
   }
 )
