@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { openapi } from "@elysia/openapi";
 import { songsRoute } from "./modules/songs/songs.route";
+import { lyricsRoute } from "./modules/lyrics/lyrics.route";
 
 export const app = new Elysia()
   .use(
@@ -15,6 +16,7 @@ export const app = new Elysia()
     })
   )
   .use(songsRoute)
+  .use(lyricsRoute)
   .get("/", () => "Hello Elysia! Music Player API is running. Check /openapi for docs.")
   .listen(3000);
 
