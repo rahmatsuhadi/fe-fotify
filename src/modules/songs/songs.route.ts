@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { searchSongs, getTrendingSongs, getSongDetail } from "./songs.service";
+import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs } from "./songs.service";
 
 const SongSchema = t.Object({
   id: t.String(),
@@ -31,6 +31,13 @@ const DetailSchema = t.Object({
 });
 
 const ErrorSchema = t.Object({ error: t.String() });
+
+const PlaylistSchema = t.Object({
+  playlistId: t.String(),
+  title: t.String(),
+  author: t.String(),
+  songs: t.Array(SongSchema),
+});
 
 export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
   "/search",
@@ -119,6 +126,41 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
     detail: {
       summary: "Get song details",
       description: "Get specific video metadata by ID",
+    },
+  }
+)
+.get(
+  "/playlists",
+  async ({ query, set }) => {
+    try {
+      if (!query.name) {
+        set.status = 400;
+        return { error: "Query parameter 'name' is required" };
+      }
+      const data = await getPlaylistSongs(query.name);
+      if (!data) {
+        set.status = 404;
+        return { error: "Playlist not found" };
+      }
+      return data;
+    } catch (error) {
+      set.status = 500;
+      return { error: "Internal server error fetching playlist" };
+    }
+  },
+  {
+    query: t.Object({
+      name: t.String(),
+    }),
+    response: {
+      200: PlaylistSchema,
+      400: ErrorSchema,
+      404: ErrorSchema,
+      500: ErrorSchema,
+    },
+    detail: {
+      summary: "Discover Playlist",
+      description: "Search for a playlist by name and fetch its songs",
     },
   }
 );

@@ -46,4 +46,14 @@ describe("Songs Module - Search", () => {
     const response = await app.handle(new Request("http://localhost/api/songs/this_id_is_invalid_1234"));
     expect([404, 500]).toContain(response.status);
   }, 15000);
+
+  it("Should return playlist data for a valid playlist name", async () => {
+    const response = await app.handle(new Request("http://localhost/api/songs/playlists?name=Musik+Indonesia"));
+    expect(response.status).toBe(200);
+    const data = await response.json() as any;
+    expect(data).toHaveProperty("playlistId");
+    expect(data).toHaveProperty("title");
+    expect(Array.isArray(data.songs)).toBe(true);
+    expect(data.songs.length).toBeGreaterThan(0);
+  }, 15000);
 });

@@ -60,3 +60,39 @@ export const getTrendingSongs = async () => {
     thumbnail: v.thumbnail,
   }));
 };
+
+export const getPlaylistSongs = async (keyword: string) => {
+  try {
+    const searchResult = await yts({ query: keyword });
+    const playlists = searchResult.playlists;
+    
+    if (!playlists || playlists.length === 0) {
+      return null;
+    }
+
+    const topPlaylist = playlists[0];
+
+    const listDetail = await Promise.race([
+      yts({ listId: topPlaylist.listId }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 8000))
+    ]) as any;
+
+    if (!listDetail || !listDetail.videos) return null;
+
+    return {
+      playlistId: topPlaylist.listId,
+      title: topPlaylist.title,
+      author: topPlaylist.author.name,
+      songs: listDetail.videos.slice(0, 30).map((v: any) => ({
+        id: v.videoId,
+        title: v.title,
+        duration: v.duration?.seconds || 0,
+        durationText: v.duration?.timestamp || "",
+        author: v.author.name,
+        thumbnail: v.thumbnail,
+      })),
+    };
+  } catch (err) {
+    return null;
+  }
+};
