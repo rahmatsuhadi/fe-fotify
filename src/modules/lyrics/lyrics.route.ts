@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia, t, status as error } from "elysia";
 import { searchLyrics } from "./lyrics.service";
 
 const LyricSchema = t.Object({
@@ -18,21 +18,18 @@ export const lyricsRoute = new Elysia({ prefix: "/api/lyrics" }).get(
   async ({ query, set }) => {
     try {
       if (!query.q) {
-        set.status = 400;
-        return { error: "Query parameter 'q' is required" };
+        return error(400, { error: "Query parameter 'q' is required" });
       }
 
       const lyrics = await searchLyrics(query.q);
 
       if (!lyrics) {
-        set.status = 404;
-        return { error: "Lyrics not found" };
+        return error(404, { error: "Lyrics not found" });
       }
 
       return lyrics;
-    } catch (error) {
-      set.status = 500;
-      return { error: "Internal server error fetching lyrics" };
+    } catch (err) {
+      return error(500, { error: "Internal server error fetching lyrics" });
     }
   },
   {

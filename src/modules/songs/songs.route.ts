@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia, t, status as error } from "elysia";
 import { searchSongs, getTrendingSongs, getSongDetail, getPlaylistSongs } from "./songs.service";
 
 const SongSchema = t.Object({
@@ -44,21 +44,18 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
   async ({ query, set }) => {
     try {
       if (!query.q) {
-        set.status = 400;
-        return { error: "Query parameter 'q' is required" };
+        return error(400, { error: "Query parameter 'q' is required" });
       }
       
       const data = await searchSongs(query.q);
       
       if (data.songs.length === 0 && data.artists.length === 0) {
-        set.status = 404;
-        return { error: "No results found" };
+        return error(404, { error: "No results found" });
       }
       
       return data;
-    } catch (error) {
-      set.status = 500;
-      return { error: "Internal server error" };
+    } catch (err) {
+      return error(500, { error: "Internal server error" });
     }
   },
   {
@@ -83,9 +80,8 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
     try {
       const trending = await getTrendingSongs();
       return { trending };
-    } catch (error) {
-      set.status = 500;
-      return { error: "Failed to fetch trending songs" };
+    } catch (err) {
+      return error(500, { error: "Failed to fetch trending songs" });
     }
   },
   {
@@ -105,13 +101,11 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
     try {
       const song = await getSongDetail(id);
       if (!song) {
-        set.status = 404;
-        return { error: "Song not found" };
+        return error(404, { error: "Song not found" });
       }
       return song;
-    } catch (error) {
-      set.status = 500;
-      return { error: "Failed to fetch song details" };
+    } catch (err) {
+      return error(500, { error: "Failed to fetch song details" });
     }
   },
   {
@@ -134,18 +128,15 @@ export const songsRoute = new Elysia({ prefix: "/api/songs" }).get(
   async ({ query, set }) => {
     try {
       if (!query.name) {
-        set.status = 400;
-        return { error: "Query parameter 'name' is required" };
+        return error(400, { error: "Query parameter 'name' is required" });
       }
       const data = await getPlaylistSongs(query.name);
       if (!data) {
-        set.status = 404;
-        return { error: "Playlist not found" };
+        return error(404, { error: "Playlist not found" });
       }
       return data;
-    } catch (error) {
-      set.status = 500;
-      return { error: "Internal server error fetching playlist" };
+    } catch (err) {
+      return error(500, { error: "Internal server error fetching playlist" });
     }
   },
   {
