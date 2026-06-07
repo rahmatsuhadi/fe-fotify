@@ -22,8 +22,13 @@ export const app = new Elysia()
   .use(songsRoute)
   .use(lyricsRoute)
   .get("/", () => "Hello Elysia! Music Player API is running. Check /openapi for docs.")
-  .listen(PORT);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT);
+
+  console.log(
+    `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  );
+}
+
+
